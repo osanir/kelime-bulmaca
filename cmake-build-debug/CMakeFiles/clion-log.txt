@@ -1,0 +1,4 @@
+/opt/JetBrains/apps/CLion/ch-0/183.5429.37/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -G "CodeBlocks - Unix Makefiles" /home/divergent/projects/kelime-bulmaca
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/divergent/projects/kelime-bulmaca/cmake-build-debug
