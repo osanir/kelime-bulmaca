@@ -130,43 +130,44 @@ void Database::addToTree(string str, string sorted, Node* iter, int letterPos){
 
 // Sözlükten rastgele bir kelime seçer
 void Database::pickRandom(Node* iter){
-/*     for(auto bl : blackListLetters){
-        if( bl == iter->ch )
-            return;
-    }
-    if( !iter->word.empty() ){ // 1
-        //2
-        int ran = rand() % iter->word.size();
-        randomPick = iter->word[ran];
-        return;
-    }else{ 
-        // 3
-        for( auto child : iter->children ){
-            bool inBl = false;
-            for(auto bl : blackListLetters){
-                if( bl == child->ch )
-                    inBl = true;
-            }
-            if( inBl == true ){
-                continue;
-            }
-            pickRandom(child);
-            return;
+    /*  for(auto bl : blackListLetters){
+            if( bl == iter->ch )
+                return;
         }
-    }  */
-/*     if( !iter->word.empty() ){
-        randomPick = iter->word.back();
-    }else{
-        if( !iter->children.empty() ){
-            int i;
-            for(i=0; iter->children[i]->inBlackList == true; i++);
-            iter = iter->children[i];
-            pickRandom(iter);
+        if( !iter->word.empty() ){ // 1
+            //2
+            int ran = rand() % iter->word.size();
+            randomPick = iter->word[ran];
+            return;
+        }else{ 
+            // 3
+            for( auto child : iter->children ){
+                bool inBl = false;
+                for(auto bl : blackListLetters){
+                    if( bl == child->ch )
+                        inBl = true;
+                }
+                if( inBl == true ){
+                    continue;
+                }
+                pickRandom(child);
+                return;
+            }
+        }  */
+    /*     if( !iter->word.empty() ){
+            randomPick = iter->word.back();
         }else{
-            cout << "Herhangi bir eşleşme bulunamadı!" << endl;
-            return;
-        }
-    }  */
+            if( !iter->children.empty() ){
+                int i;
+                for(i=0; iter->children[i]->inBlackList == true; i++);
+                iter = iter->children[i];
+                pickRandom(iter);
+            }else{
+                cout << "Herhangi bir eşleşme bulunamadı!" << endl;
+                return;
+            }
+        }  
+    */
 
     if( !iter->children.empty() ){
         int num;
@@ -378,8 +379,12 @@ void Database::setExactLetters(){
                 for(auto c : exactLetters)
                     if(ch == c)
                         itContain = true;
-                if( itContain == false)
-                    exactLetters.push_back(ch);
+                if( itContain == false){
+                    for( int i=0; i<randomPickSorted.size(); i++){
+                        if( randomPickSorted[i] == ch )
+                            exactLetters.push_back(ch);
+                    }
+                }
             }
         }
     }
