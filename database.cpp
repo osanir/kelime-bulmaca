@@ -29,14 +29,20 @@ void Database::start(){
     importDatabase();
 
     while(1){
-        cout << endl << endl << endl;
+        simplifyTree(root);
+        //cout << endl << endl << endl;
         string oldPick = randomPick;
+        randomPick.clear();
         pickRandom(root);
+        cout << "My RandomPick: " << randomPick;
         calculateLetterValues();
+        if(randomPick.empty()){
+            cout << "İşlem tamamlandı, tahminim: " << oldPick;
+            return;
+        }
         if(randomPick == oldPick) continue;
-
-        cout << randomPick << endl;
-        cout << randomPickSorted << endl;
+        //cout << randomPick << endl;
+        //cout << randomPickSorted << endl;
         for(auto val : values)
             cout << val;
         cout << endl << "Score : ";
@@ -46,8 +52,9 @@ void Database::start(){
         int counter = 0;
         for( auto ch : exactLetters ){
             for(auto c : randomPick){
-                if( ch == c )
+                if( ch == c ){
                     counter++;
+                }
             }
         }
         score -= counter;
@@ -62,7 +69,6 @@ void Database::start(){
         possibleLetters.clear();
 
 
-        simplifyTree(root);
     }
 }
 
@@ -121,6 +127,30 @@ void Database::addToTree(string str, string sorted, Node* iter, int letterPos){
 
 // Sözlükten rastgele bir kelime seçer
 void Database::pickRandom(Node* iter){
+    /* State Machine
+    1- Node kelime tutuyor mu?  2 : 3
+    2- Rastgele bir sözcük tut. 4
+    3- Kara listede olmayan elemanı var mı? 5 : 4
+    4- Sonlandır.
+    5- Elemana git 1
+    */
+    if(iter->inBlackList)
+        return;
+    if( !iter->word.empty() ){ // 1
+        //2
+        int ran = rand() % iter->word.size();
+        randomPick = iter->word[ran];
+        return;
+    }else{ 
+        // 3
+        for( auto child : iter->children ){
+            if(child->inBlackList == false){
+                pickRandom(child);
+                return;                
+            }
+        }
+
+    }
 /*     if( !iter->word.empty() ){
         randomPick = iter->word.back();
     }else{
@@ -135,7 +165,7 @@ void Database::pickRandom(Node* iter){
         }
     } */
 
-    if( !iter->children.empty() ){
+    /* if( !iter->children.empty() ){
         int num;
         int i=0;
         bool cf = false;
@@ -151,7 +181,7 @@ void Database::pickRandom(Node* iter){
         }while(1);
         if(!cf){
             iter = iter->children[num];
-           // cout << "Şuan ch: " << iter->ch << " bl: " << iter->inBlackList << endl;
+           // cout << "Şuan ch: " << iter-> ch << " bl: " << iter->inBlackList << endl;
             pickRandom(iter);
         }else{
             if(iter->word.empty() ){
@@ -168,7 +198,7 @@ void Database::pickRandom(Node* iter){
         int num = rand() % iter->word.size();
         randomPick = iter->word[num];
         return;
-    }
+    } */
 }
 
 void Database::calculateLetterValues(){
@@ -213,7 +243,50 @@ void Database::calculateLetterValues(){
 }
 
 void Database::simplifyTree(Node *iter){
-    if( !iter->children.empty() ){
+    /* State Machine
+    1- Harf karalistede mi? 2 : 3
+    2- Node'un kara liste değişkenini düzenle, 4
+    3- Çocuğu var mı? 6 : 4
+    4- Üst node'a geç (return), 3
+    5- Çocuğa git, 1
+    6- Kara listede olmayan çocuğu var mı? 5 : 7
+    7- Node kelime tutuyor mu? 4 : 2
+    */
+    bool inBlackList = false;
+    for(auto bl : blackListLetters ){
+        if( bl == iter->ch ){
+            inBlackList = true;
+            break;
+        }
+    }   
+
+    if( inBlackList ){    // 1  
+        iter->inBlackList = true; // 2 
+        return; // 4 
+    }else{
+        if( !iter->children.empty() ){ //3
+            bool flag = false;
+            for( auto child : iter->children ){ // 6
+                if( child->inBlackList == false )
+                    flag = true;
+            }
+            if( flag == true ){ // 6 kara listede olmayan çocuğu var
+                for( auto child : iter->children) // 5
+                    pickRandom(child);
+            }else{  // 2
+                if( !iter->word.empty() ){
+                    return;
+                }else{
+                    iter->inBlackList = true;
+                    return;
+                }
+            }
+            
+        }else{
+            return; // 4
+        }
+    }
+   /*  if( !iter->children.empty() ){
         for(int i=0; i<iter->children.size(); i++){
             if(iter->children[i]->inBlackList)
                 continue;
@@ -224,7 +297,7 @@ void Database::simplifyTree(Node *iter){
             }
             simplifyTree(iter->children[i]);
         } 
-    }
+    } */
 /*         for(auto node : iter->children){
             if(node->inBlackList)   
                 continue;
