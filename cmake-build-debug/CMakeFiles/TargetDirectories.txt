@@ -1,3 +1,0 @@
-/home/divergent/projects/kelime-bulmaca/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/divergent/projects/kelime-bulmaca/cmake-build-debug/CMakeFiles/kelime_bulmaca.dir
-/home/divergent/projects/kelime-bulmaca/cmake-build-debug/CMakeFiles/edit_cache.dir
