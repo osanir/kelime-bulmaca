@@ -27,7 +27,7 @@ Database::Database(){
 
 void Database::start(){
     importDatabase();
-
+    //traverse(root);
     while(1){
         //cout << endl << endl << endl;
         string oldPick = randomPick;
@@ -70,9 +70,10 @@ void Database::start(){
         // kesin bulunan harfleri bulduktan sonra ihtiyacımız kalmadı
         possibleLetters.clear();
 
-        //simplifyTree(root);
+        simplifyTree(root);
+        
 
-    }
+    } 
 }
 
 void Database::importDatabase(){
@@ -128,81 +129,60 @@ void Database::addToTree(string str, string sorted, Node* iter, int letterPos){
     return;
 }
 
-// Sözlükten rastgele bir kelime seçer
-void Database::pickRandom(Node* iter){
-    /*  for(auto bl : blackListLetters){
-            if( bl == iter->ch )
-                return;
-        }
-        if( !iter->word.empty() ){ // 1
-            //2
-            int ran = rand() % iter->word.size();
-            randomPick = iter->word[ran];
-            return;
-        }else{ 
-            // 3
-            for( auto child : iter->children ){
-                bool inBl = false;
-                for(auto bl : blackListLetters){
-                    if( bl == child->ch )
-                        inBl = true;
-                }
-                if( inBl == true ){
-                    continue;
-                }
-                pickRandom(child);
-                return;
-            }
-        }  */
-    /*     if( !iter->word.empty() ){
-            randomPick = iter->word.back();
-        }else{
-            if( !iter->children.empty() ){
-                int i;
-                for(i=0; iter->children[i]->inBlackList == true; i++);
-                iter = iter->children[i];
-                pickRandom(iter);
-            }else{
-                cout << "Herhangi bir eşleşme bulunamadı!" << endl;
-                return;
-            }
-        }  
-    */
-
+void Database::traverse(Node* iter){
+    if( !iter->word.empty() ){
+        for(int i=0; i<iter->word.size(); i++)
+            cout << iter->word[i] << endl; 
+    }
     if( !iter->children.empty() ){
-        int num;
-        int i=0;
-        bool cf = false;
-        do{
-            num = rand() % iter->children.size();
-            i++;
-            if(iter->children[num]->inBlackList == false)
-                break;
-            if(i>iter->children.size()*2){
-                break;
-                cf = true;
-            }
-        }while(1);
-        if(!cf){
-            iter = iter->children[num];
-           // cout << "Şuan ch: " << iter-> ch << " bl: " << iter->inBlackList << endl;
-            pickRandom(iter);
-        }else{
-            if(iter->word.empty() ){
-                cout << "Buda boş!" << endl;
-            } else{
-                    
-                int num = rand() % iter->word.size();
-                randomPick = iter->word[num];
-                return;
+        for( auto child : iter->children )
+            traverse(child);
+    }
 
-            }
+}
+
+// Sözlükten rastgele bir kelime seçer
+// TODO: seçilen kelime tekrar sorulmaısn
+void Database::pickRandom(Node* iter){
+    if( iter->children.empty() ){
+        if( !iter->word.empty() ){
+            int i = rand()%iter->word.size();
+            randomPick = iter->word[i];
+            return;
         }
-    }else{
-        int num = rand() % iter->word.size();
-        randomPick = iter->word[num];
-        return;
-    } 
+    } else{
+        // black listte olan kelimeleri siler
+        list<Node*>::iterator child = iter->children.begin();
+        while( child != iter->children.end() ){
+            for( auto bl : blackListLetters ){
+                if( (*child)->ch == bl ){
+                    auto tempChild = child;
+                    child++;
+                    iter->children.erase(tempChild);
+                    child--;
+                    break;
+                }
+            }
+            child++;
+        }
+
+        child = iter->children.begin();
+        while( child != iter->children.end() ){
+            if( (*child)->children.empty() && (*child)->word.empty() ){
+                auto tempChild = child;
+                child++;
+                iter->children.erase(tempChild);
+                child--;
+            }
+            child++;
+        }
+        
+        // 
+        for( auto child : iter->children ){
+            
+            pickRandom(child); 
+        }
+    }
 }
 
 void Database::calculateLetterValues(){
@@ -247,82 +227,7 @@ void Database::calculateLetterValues(){
 }
 
 void Database::simplifyTree(Node *iter){
-    /* State Machine
-    1- Harf karalistede mi? 2 : 3
-    2- Node'un kara liste değişkenini düzenle, 4
-    3- Çocuğu var mı? 6 : 4
-    4- Üst node'a geç (return), 3
-    5- Çocuğa git, 1
-    6- Kara listede olmayan çocuğu var mı? 5 : 7
-    7- Node kelime tutuyor mu? 4 : 2
-    */
-    bool inBlackList = false;
-    for(auto bl : blackListLetters ){
-        if( bl == iter->ch ){
-            inBlackList = true;
-            break;
-        }
-    }   
 
-    if( inBlackList ){    // 1  
-        iter->inBlackList = true; // 2 
-        return; // 4 
-    }else{
-        if( !iter->children.empty() ){ //3
-            bool flag = false;
-            for( auto child : iter->children ){ // 6
-                if( child->inBlackList == false )
-                    flag = true;
-            }
-            if( flag == true ){ // 6 kara listede olmayan çocuğu var
-                for( auto child : iter->children) // 5
-                    pickRandom(child);
-            }else{  // 2
-                if( !iter->word.empty() ){
-                    return;
-                }else{
-                    iter->inBlackList = true;
-                    return;
-                }
-            }
-            
-        }else{
-            return; // 4
-        }
-    }
-   /*  if( !iter->children.empty() ){
-        for(int i=0; i<iter->children.size(); i++){
-            if(iter->children[i]->inBlackList)
-                continue;
-            for(auto bl : blackListLetters){
-                if(iter->children[i]->ch == bl ){
-                    iter->children[i]->inBlackList = true;
-                }
-            }
-            simplifyTree(iter->children[i]);
-        } 
-    } */
-/*         for(auto node : iter->children){
-            if(node->inBlackList)   
-                continue;
-            for(auto bl : blackListLetters){
-                if(node->ch == bl){
-                    node->inBlackList = true;
-                    cout << node->ch << " elendi" << endl;
-                }
-            }
-            simplifyTree(node);
-        }
-    }
- */   /*  for(auto node : iter->children){
-        for(auto bl : blackListLetters){
-            if( node->ch == bl){
-                node->inBlackList = true;
-            }
-        }
-        if(!node->children.empty())
-            simplifyTree(node);
-    } */
 }
 
 void Database::setPossibleLetters( int score, int pos = 0, string newStr = "" ){

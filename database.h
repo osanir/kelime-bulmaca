@@ -4,16 +4,18 @@
 #include <algorithm>
 #include <vector>
 #include <ctime>
+#include <list>
 
 using namespace std;
 
 struct Node{
     char ch; 
     bool inBlackList;
+    bool canAsk;
     vector<string> word;
-    vector<Node*> children;
-    Node(){ word.clear(); inBlackList = false;}
-    Node(char c){ ch = c; word.clear(); inBlackList = false;}
+    list<Node*> children;
+    Node(){ word.clear(); inBlackList = false; canAsk = true;}
+    Node(char c){ ch = c; word.clear(); inBlackList = false; canAsk = true;}
 };
 
 class Database{
@@ -23,6 +25,7 @@ public:
     void start();
     void importDatabase();
     void addToTree(string str, string sorted, Node* iter, int letterPos);
+    void traverse(Node* iter);
     void pickRandom(Node* iter);
     void calculateLetterValues();
     void simplifyTree(Node* iter);
