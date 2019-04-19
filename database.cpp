@@ -149,7 +149,10 @@ void Database::pickRandom(Node* iter){
             int i = rand()%iter->word.size();
             randomPick = iter->word[i];
             return;
+        }else{
+            cout << "Aranan kelime veri tabanında yok!" << endl;
         }
+
     } else{
         // black listte olan kelimeleri siler
         list<Node*>::iterator child = iter->children.begin();
@@ -179,7 +182,6 @@ void Database::pickRandom(Node* iter){
         
         // 
         for( auto child : iter->children ){
-            
             pickRandom(child); 
         }
     }
